@@ -2,7 +2,7 @@ const std = @import("std");
 
 pub fn call(comptime number: usize) void {
     const swi = comptime std.fmt.comptimePrint("SWI      {}\n", .{number});
-    asm volatile (swi ::: "r0", "r1", "r2", "r3");
+    asm volatile (swi ::: .{ .r0 = true, .r1 = true, .r2 = true, .r3 = true });
 }
 
 pub fn halt() void {

@@ -1,0 +1,14 @@
+.{
+    .name = .zig_gba,
+    .version = "0.0.0",
+    .fingerprint = 0x62153f6ec2f3206e, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "libc.txt",
+    },
+}

@@ -6,24 +6,30 @@ const flags = .{"-lgba"};
 const devkitpro = "/opt/devkitpro";
 
 pub fn build(b: *std.Build) void {
-    const target = std.zig.CrossTarget{
+    const target = std.Target.Query{
         .cpu_arch = .thumb,
         .os_tag = .freestanding,
         .cpu_model = .{ .explicit = &std.Target.arm.cpu.arm7tdmi },
     };
     const optimize = b.standardOptimizeOption(.{});
 
-    const obj = b.addObject(.{
-        .name = "zig-gba",
+    const mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .link_libc = true,
         .target = b.resolveTargetQuery(target),
         .optimize = optimize,
     });
-    obj.setLibCFile(std.Build.LazyPath{ .cwd_relative = "libc.txt" });
-    obj.addIncludePath(std.Build.LazyPath{ .cwd_relative = devkitpro ++ "/libgba/include"});
-    obj.addIncludePath(std.Build.LazyPath{ .cwd_relative = devkitpro ++ "/portlibs/gba/include"});
-    obj.addIncludePath(std.Build.LazyPath{ .cwd_relative = devkitpro ++ "/portlibs/armv4/include"});
+    b.libc_file = "libc.txt";
+    mod.addIncludePath(.{ .cwd_relative = devkitpro ++ "/devkitARM/lib/gcc/arm-none-eabi/16.1.0/include"});
+    mod.addIncludePath(.{ .cwd_relative = devkitpro ++ "/devkitARM/lib/gcc/arm-none-eabi/16.1.0/include-fixed"});
+    mod.addIncludePath(.{ .cwd_relative = devkitpro ++ "/libgba/include"});
+    mod.addIncludePath(.{ .cwd_relative = devkitpro ++ "/portlibs/gba/include"});
+    mod.addIncludePath(.{ .cwd_relative = devkitpro ++ "/portlibs/armv4/include"});
+
+    const obj = b.addObject(.{
+        .name = "zig-gba",
+        .root_module = mod,
+    });
 
     const extension = if (builtin.target.os.tag == .windows) ".exe" else "";
     const elf = b.addSystemCommand(&.{
